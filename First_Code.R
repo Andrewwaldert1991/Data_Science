@@ -30,6 +30,12 @@ m <- matrix(1:10, nrow = 2, ncol = 5, F) # by collumn
 dim(m) # gives the dimensions of m
 attributes(m) # gives the attributes of the matrix
 
+### Plotting a normal distribution
+x <- seq(from = -3, to = +3, length.out = 100)
+plot(x, dnorm(x))
+
+
+
 m <- matrix(rnorm(100), nrow = 20, ncol = 5, T) # by row  of randomly generated numbers of normal distributiob
 
 # Assigning a Matrix to a numeric array
