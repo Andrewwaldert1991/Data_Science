@@ -1,10 +1,21 @@
 
-### 1. Reading in the data 
+# Setting the working directory
+setwd("C:/Users/awaldert/Desktop/Data_Science")
+
+# Loading some tools 
+library(dplyr)
+library(rpart) 
+library(ggplot2)
+library(caTools)
+
+
+# Reading in the data 
 data_full <- read.csv("data.csv")
 head(data_full)
 dim(data_full)
-options(width = 100)
 class(data_full)
+
+# Most useful in sumarizing the data
 str(data_full)
 
 ### Transformig the variables from data.frame to vectors for al 18 variables 
@@ -19,6 +30,8 @@ Condition_V <- as.vector(unlist(data_full$condition))
 Street_V <- as.vector(unlist(data_full$street))
 City_V <- as.vector(unlist(data_full$city))
 
+# Assessing correlation to see wwhich variables are correlated 
+
 par(mfrow=c(3, 2))
 
 plot(Bedrooms_V, Price_V, ylim = c(0, 1000000))
@@ -28,15 +41,48 @@ plot(Sqft_Lot_V, Price_V,ylim = c(0, 1000000))
 plot(Waterfront_V, Price_V, ylim = c(0, 1000000))
 plot(Condition_V, Price_V,ylim = c(0, 1000000))
 
-### Setting up multiple regression for the variavles 
+# Splitting the dataset into 65% Train and 35% Test by using the Price Column
 
-M_Regress <- lm(Price_V ~ Bedrooms_V + Bathrooms_V +Sqft_Living_V + Sqft_Lot_V + Waterfront_V + Condition_V)
-summary(M_Regress)
+sample.split(data_full$price, SplitRatio = 0.65) -> Split_Values
 
-Sig_M_Regress <- lm(Price_V ~ Sqft_Living_V + Sqft_Lot_V)
-summary(Sig_M_Regress)
+subset(data_full, Split_Values==T) -> Train_Set
+subset(data_full, Split_Values==F) -> Test_Set
 
-### Eliminating insignificant Factors
+head(Train_Set)
+dim(Train_Set)
+dim(Test_Set)
+
+# Building a linear model on top of the training dataset
+
+mod_regress <- lm(price~ bedrooms + bathrooms + sqft_living + sqft_lot + floors + waterfront + view 
+                  + condition + sqft_above + sqft_basement 
+                  + yr_built + yr_renovated, Train_Set)
+
+# Alternative Regression Model to take out insignificant variables
+mod_regress <- lm(price~ bedrooms + bathrooms + sqft_living + sqft_lot + view 
+                  + yr_built, Train_Set)
+
+summary(mod_regress)
+predict(mod_regress, Test_Set) -> result_regress
+cbind(Actual = Test_Set$price, Predicted = result_regress) -> Final_Data
+as.data.frame(Final_Data)-> Final_Data
+head(Final_Data)
+
+# Finding theb RMSE (Root Mean Squared Error)
+
+(Final_Data$Actual- Final_Data$Predicted) -> error
+cbind(Final_Data, error) -> Final_Data
+RMSE <- sqrt(mean(Final_Data$error^2))
+par(mfrow=c(1, 1))
+plot(Final_Data$Actual, Final_Data$Predicted)
+plot(Final_Data$error)
+
+
+
+
+
+############################################################################
+# Eliminating insignificant Factors
 
 full.model <- M_Regress
 
