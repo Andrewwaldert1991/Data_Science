@@ -12,6 +12,5 @@ read.csv("pokemon.csv") -> pokemon_data
 
 head(pokemon_data)
 str(pokemon_data)
-
-# Learning how ML works using the diamionds Dataset 
-View(diamonds)
+plot(pokemon_data)
+View(pokemon_data)

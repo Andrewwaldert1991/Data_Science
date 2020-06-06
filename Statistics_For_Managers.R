@@ -44,6 +44,14 @@ getwd() # See which directory you are currently in
 
 setwd("C:/Users/awaldert/Desktop/Data_Science") # Set your Working Directory to your desired folder
 
+# But first we need to load some tools for later ... 
+library(dplyr)
+library(rpart) 
+library(ggplot2)
+library(caTools)
+library(pdftools)
+library(plotrix)
+
 # The Laws on Probability
 
 # Probability = Number of desired outcomes/Number of possible outomces
@@ -100,15 +108,25 @@ y <- dnorm(x, mean = 5, sd =1)
 plot(x, y, main = "Normal Distribution", col = "blue", type = "l")
 
 # Calculating Probabilities on the Normal Distribution using the slides and our calculator ;)!
+# And now lets do that in R
+# 1. Test scores are normally distributed with a Mean of 45% and a Standard Deviation of 6%. What is the probability that a student scores one of the following  cases: 
+# Up to 60%
+# More than 70%
+# Between 60% and 80%
 
-# But first we need to load some tools for later ... 
-library(dplyr)
-library(rpart) 
-library(ggplot2)
-library(caTools)
-library(pdftools)
+p <- pnorm(60, mean=45, sd=25, lower.tail = TRUE) 
+print(p)
+
+p <- pnorm(70, mean=45, sd=25, lower.tail = FALSE) 
+print(p)
+
+p <- pnorm(70, mean=45, sd=25, lower.tail = TRUE)- 
+  pnorm(60, mean=45, sd=25, lower.tail = TRUE)
+print(p)
 
 # Enough with the boring stuff, let us get into some data!
+
+-------------------------------------------------------------------------------------------------------------------
 
 # Reading in the House Price data
 data_full <- read.csv("data.csv") # This csv file is in my working directory, to read it maje sure it is in yours and you have set your current working directory in R accordingly, and correct spelling helps
@@ -138,21 +156,59 @@ range(data_full$price)
 IQR(data_full$price) # The interquartile range of an observation variable is the difference of its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value. 
 quantile(data_full$price, c(.25, .44, .99))
 
+-------------------------------------------------------------------------------------------------------------------
 
 # Plotting
+  
 # After having looked at your preliminary data, let us have a look at it by creaing simple and not so simple plots
+# Scatterplot (For this we need two variables X, for the X Axis and Y for the Y Axis)
+x <- data_full$sqft_living
+y <- data_full$price
+scatter <- plot(x, y, main = "Correlation between Sqft Living Space and Price of Houses", ylab = "Price of houses", xlab = "Living Space Size in Sqft")
+scatter
+
+# Uppss. this looks a bit off due to some extreme values, lets fix this
+scatter <- plot(x, y, main = "Correlation between Sqft Living Space and Price of Houses", ylab = "Price of houses", xlab = "Living Space Size in Sqft", ylim = c(0, 5000000))
+scatter
+
+# Correlation Coefficient R (how to calculate this one)
+cor(data_full$price, data_full$sqft_living)
+
+# Pie Chart 
+df <- data.frame(
+  group = c("Male", "Female", "Child"),
+  value = c(25, 25, 50)
+)
+head(df)
+
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+  geom_bar(width = 1, stat = "identity")
+bp
+
+pie <- bp + coord_polar("y", start=0)
+pie
+
+# Histogram using a dataset built in in R
+hist(AirPassengers, 
+     main="Histogram for Air Passengers", 
+     xlab="Passengers", 
+     border="blue", 
+     col="green",
+     xlim=c(100,700),
+     las=1, 
+     breaks=5)
+
+# Boxplot
+bp <- boxplot(data_full$sqft_living)
+bp
+
+# Heatmap
+data <- as.matrix(mtcars)
+heatmap(data, scale = "column")
 
 
-## Scatterplot 
-## Pie Chart 
-## Histogram
-## Boxplot
-## Heatmap
-## Worldmap 
+-------------------------------------------------------------------------------------------------------------------
 
-
-# The normal distribution 
-# Calculating Probabilities on the normal distribution
 # Calculating Confidence Intervals 
 # Calculating Z Scores and the Z Score Table 
 # Hypothesis Test (One and Two Tailed)
