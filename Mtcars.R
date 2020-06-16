@@ -1,2 +1,0 @@
-attach(mtcars)
-head(mtcars)
